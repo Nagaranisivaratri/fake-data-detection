@@ -6,7 +6,8 @@ app.use(express.json());
 
 // ✅ Google Apps Script Web App URL
 const GOOGLE_SHEET_URL =
-  "https://script.google.com/macros/s/AKfycbzoy8Um1JkOe_9lYcB-5x8QjrV1-Fdd2Mh9o9Tk1h1REeScNXeKdo5XPVwzufCyJ1vYRA/exec";
+  "https://script.google.com/macros/s/AKfycbz4ArOZbpv4UYhtuOxXRYORIean1Y-sO3LkGYtU8jbqZy5WVQGW5St6B2vZMnaVJj0CfQ/exec";
+
 
 // Serve HTML form
 app.get("/", (req, res) => {
@@ -43,3 +44,4 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
