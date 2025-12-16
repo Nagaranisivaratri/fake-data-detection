@@ -4,9 +4,9 @@ const path = require("path");
 const app = express();
 app.use(express.json());
 
-// 🔴 REPLACE WITH YOUR NEW GOOGLE SCRIPT URL
+// 🔴 PUT YOUR NEW APPS SCRIPT URL HERE
 const GOOGLE_SHEET_URL =
-  "https://script.google.com/macros/s/AKfycbxMV9Evoc-ptkH2DBhfUKGTDJJUL54WeD-3AoAV_fUvHsQZy-d8HxwQMjlNtmFIh1ZSYg/exec";
+  "https://script.google.com/macros/s/AKfycbxALCnSyu4u_M8SctDxmSyY2PPZKZ4plJG8v8Dstnc-c5uTu0fQi4y9YRNeQ8LFMNZmEw/exec";
 
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "index.html"));
@@ -22,16 +22,16 @@ app.post("/submit", async (req, res) => {
       body: JSON.stringify(req.body),
     });
 
-    const text = await response.text();
+    const result = await response.text();
 
     if (!response.ok) {
-      console.error("Sheet error:", text);
-      return res.status(500).send("Failed to save data");
+      throw new Error(result);
     }
 
     res.send("Saved Successfully");
+
   } catch (err) {
-    console.error("Server error:", err);
+    console.error("Sheet error:", err.message);
     res.status(500).send("Failed to save data");
   }
 });
