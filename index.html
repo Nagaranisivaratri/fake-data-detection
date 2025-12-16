@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Fake Data Detection Survey</title>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg,#667eea,#764ba2);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.container {
+  background: white;
+  padding: 30px;
+  width: 520px;
+  border-radius: 16px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+}
+
+h2 {
+  text-align: center;
+}
+
+.section {
+  margin-top: 20px;
+  font-weight: bold;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 5px;
+}
+
+label {
+  margin-top: 12px;
+  display: block;
+  font-weight: 600;
+}
+
+input, select, textarea {
+  width: 100%;
+  padding: 10px;
+  margin-top: 6px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+textarea {
+  resize: none;
+}
+
+button {
+  width: 100%;
+  margin-top: 25px;
+  padding: 14px;
+  background: linear-gradient(to right,#667eea,#764ba2);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<h2>Smart Survey Form</h2>
+
+<form id="dataForm">
+
+<div class="section">Basic Details</div>
+
+<label>Name</label>
+<input id="userId" required>
+
+<label>Age</label>
+<input id="age" type="number" required>
+
+<label>Gender</label>
+<select id="gender" required>
+  <option value="" disabled selected>Select one option</option>
+  <option>Male</option>
+  <option>Female</option>
+  <option>Other</option>
+</select>
+
+<label>City</label>
+<input id="city" required>
+
+<label>Address</label>
+<input id="address" required>
+
+<label>Phone</label>
+<input id="phone" required>
+
+<label>Email</label>
+<input id="email" type="email" required>
+
+<div class="section">Personality & Habits</div>
+
+<label>I plan my work before starting</label>
+<select id="q1" required>
+  <option value="" disabled selected>Select one option</option>
+  <option>Yes</option>
+  <option>Sometimes</option>
+  <option>No</option>
+</select>
+
+<label>I enjoy learning new things</label>
+<select id="q2" required>
+  <option value="" disabled selected>Select one option</option>
+  <option>Always</option>
+  <option>Sometimes</option>
+  <option>Never</option>
+</select>
+
+<label>I complete tasks on time</label>
+<select id="q3" required>
+  <option value="" disabled selected>Select one option</option>
+  <option>Yes</option>
+  <option>Sometimes</option>
+  <option>No</option>
+</select>
+
+<label>I get distracted easily</label>
+<select id="q4" required>
+  <option value="" disabled selected>Select one option</option>
+  <option>Yes</option>
+  <option>Sometimes</option>
+  <option>No</option>
+</select>
+
+<label>I check my work before submitting</label>
+<select id="q5" required>
+  <option value="" disabled selected>Select one option</option>
+  <option>Always</option>
+  <option>Sometimes</option>
+  <option>Never</option>
+</select>
+
+<label>I feel comfortable talking to new people</label>
+<select id="q6" required>
+  <option value="" disabled selected>Select one option</option>
+  <option>Yes</option>
+  <option>Sometimes</option>
+  <option>No</option>
+</select>
+
+<label>I like helping others</label>
+<select id="q7" required>
+  <option value="" disabled selected>Select one option</option>
+  <option>Yes</option>
+  <option>Sometimes</option>
+  <option>No</option>
+</select>
+
+<div class="section">Short Answer</div>
+
+<label>Describe yourself in one line</label>
+<textarea id="q8_text" rows="2" required></textarea>
+
+<button type="submit">Submit</button>
+
+</form>
+</div>
+
+<script>
+let startTime = null;
+let backspaceCount = 0;
+let charCount = 0;
+
+document.querySelectorAll("input, textarea").forEach(el => {
+  el.addEventListener("focus", () => {
+    if (!startTime) startTime = Date.now();
+  });
+
+  el.addEventListener("keydown", e => {
+    if (e.key === "Backspace") backspaceCount++;
+    else if (e.key.length === 1) charCount++;
+  });
+});
+
+document.getElementById("dataForm").addEventListener("submit", e => {
+  e.preventDefault();
+
+  const totalTime = ((Date.now() - startTime) / 1000).toFixed(2);
+  const typingSpeed = (charCount / totalTime).toFixed(2);
+
+  let trustScore = 100;
+  if (typingSpeed > 12) trustScore -= 30;
+  if (backspaceCount < 2) trustScore -= 20;
+  if (totalTime < 10) trustScore -= 20;
+
+  let status = "Genuine";
+  if (trustScore < 60) status = "Suspicious";
+  if (trustScore < 40) status = "Fake";
+
+  const data = {
+    userId: userId.value,
+    age: age.value,
+    gender: gender.value,
+    city: city.value,
+    address: address.value,
+    phone: phone.value,
+    email: email.value,
+    q1: q1.value,
+    q2: q2.value,
+    q3: q3.value,
+    q4: q4.value,
+    q5: q5.value,
+    q6: q6.value,
+    q7: q7.value,
+    description: q8_text.value,
+    typingSpeed,
+    backspaceCount,
+    totalTime,
+    trustScore,
+    status
+  };
+
+  fetch("/submit", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  })
+  .then(res => res.text())
+  .then(msg => alert(msg));
+
+  dataForm.reset();
+  startTime = null;
+  backspaceCount = 0;
+  charCount = 0;
+});
+</script>
+
+</body>
+</html>
