@@ -1,49 +1,41 @@
 const express = require("express");
-const fs = require("fs");
 const path = require("path");
 
 const app = express();
 app.use(express.json());
 
-// Paths
-const BASE_DIR = __dirname;
-const CSV_FILE = path.join(BASE_DIR, "data.csv");
-const HTML_FILE = path.join(BASE_DIR, "index.html");
+// 🔴 GOOGLE SHEETS WEB APP URL
+const GOOGLE_SHEET_URL =
+  "https://script.google.com/macros/s/AKfycbzoy8Um1JkOe_9lYcB-5x8QjrV1-Fdd2Mh9o9Tk1h1REeScNXeKdo5XPVwzufCyJ1vYRA/exec";
 
-// Serve the form
+// Serve HTML form
 app.get("/", (req, res) => {
-  res.sendFile(HTML_FILE);
+  res.sendFile(path.join(__dirname, "index.html"));
 });
-
-// Create CSV with headers if it does not exist
-if (!fs.existsSync(CSV_FILE)) {
-  const header =
-    "UserID,Age,Gender,City,Address,Phone,Email," +
-    "Q1_PlanWork,Q2_Learning,Q3_OnTime,Q4_Distracted," +
-    "Q5_CheckWork,Q6_Social,Q7_Helpful,Description," +
-    "TypingSpeed,BackspaceCount,ResponseTime,TrustScore,Status\n";
-
-  fs.writeFileSync(CSV_FILE, header);
-}
 
 // Handle form submission
-app.post("/submit", (req, res) => {
-  const d = req.body;
+app.post("/submit", async (req, res) => {
+  const data = req.body;
+  console.log("Received:", data);
 
-  console.log("Received:", d);
+  try {
+    const fetch = (await import("node-fetch")).default;
 
-  const row =
-    `${d.userId},${d.age},${d.gender},${d.city},${d.address},${d.phone},${d.email},` +
-    `${d.q1},${d.q2},${d.q3},${d.q4},${d.q5},${d.q6},${d.q7},` +
-    `"${d.description}",` +
-    `${d.typingSpeed},${d.backspaceCount},${d.totalTime},${d.trustScore},${d.status}\n`;
+    await fetch(GOOGLE_SHEET_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
 
-  fs.appendFileSync(CSV_FILE, row);
-  res.send("Saved Successfully");
+    res.send("Saved to Google Sheet successfully");
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).send("Failed to save data");
+  }
 });
 
-// Start server
-const PORT = 3000;
+// IMPORTANT: Render uses dynamic PORT
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
