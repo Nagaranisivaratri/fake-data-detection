@@ -4,18 +4,14 @@ const path = require("path");
 const app = express();
 app.use(express.json());
 
-// ✅ Google Apps Script Web App URL
+// 🔴 REPLACE WITH YOUR NEW GOOGLE SCRIPT URL
 const GOOGLE_SHEET_URL =
-  "https://script.google.com/macros/s/AKfycbz4ArOZbpv4UYhtuOxXRYORIean1Y-sO3LkGYtU8jbqZy5WVQGW5St6B2vZMnaVJj0CfQ/exec";
+  "https://script.google.com/macros/s/AKfycbxMV9Evoc-ptkH2DBhfUKGTDJJUL54WeD-3AoAV_fUvHsQZy-d8HxwQMjlNtmFIh1ZSYg/exec";
 
-
-
-// Serve HTML form
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "index.html"));
 });
 
-// Handle form submission
 app.post("/submit", async (req, res) => {
   try {
     const fetch = (await import("node-fetch")).default;
@@ -27,23 +23,20 @@ app.post("/submit", async (req, res) => {
     });
 
     const text = await response.text();
-    console.log("Google Script response:", text);
 
     if (!response.ok) {
-      throw new Error(text);
+      console.error("Sheet error:", text);
+      return res.status(500).send("Failed to save data");
     }
 
     res.send("Saved Successfully");
-  } catch (error) {
-    console.error("Google Sheet Error:", error.message);
+  } catch (err) {
+    console.error("Server error:", err);
     res.status(500).send("Failed to save data");
   }
 });
 
-// ✅ Render dynamic port
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-
-
