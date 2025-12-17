@@ -140,67 +140,84 @@ button {
 </div>
 
 <script>
-// 🔹 FORM RESPONSE TIMER (PAGE LOAD)
+// 🔹 Start timer when page loads
 const formStartTime = Date.now();
 
-// 🔹 TYPING METRICS
+// 🔹 Track typing metrics
 let backspaceCount = 0;
 let charCount = 0;
 
-const desc = document.getElementById("description");
-desc.addEventListener("keydown", e => {
+const descField = document.getElementById("description");
+descField.addEventListener("keydown", e => {
   if (e.key === "Backspace") backspaceCount++;
   else if (e.key.length === 1) charCount++;
 });
 
-// 🔹 SUBMIT HANDLER
+// 🔹 Handle form submission
 document.getElementById("dataForm").addEventListener("submit", async e => {
   e.preventDefault();
 
-  const responseTime = (Date.now() - formStartTime) / 1000;
-  const typingSpeed = charCount / Math.max(responseTime, 1);
+  // Calculate metrics
+  const totalTime = ((Date.now() - formStartTime) / 1000).toFixed(2);
+  const typingSpeed = (charCount / parseFloat(totalTime)).toFixed(2);
 
+  // Calculate trust score
   let trustScore = 100;
-  if (typingSpeed > 12) trustScore -= 30;
+  if (parseFloat(typingSpeed) > 12) trustScore -= 30;
   if (backspaceCount < 2) trustScore -= 20;
-  if (responseTime < 10) trustScore -= 20;
+  if (parseFloat(totalTime) < 10) trustScore -= 20;
 
   const status =
     trustScore < 40 ? "Fake" :
     trustScore < 60 ? "Suspicious" :
     "Genuine";
 
+  // ✅ FIXED: Using consistent field names
   const data = {
-    userId: userId.value,
-    age: age.value,
-    gender: gender.value,
-    city: city.value,
-    address: address.value,
-    phone: phone.value,
-    email: email.value,
-    q1: q1.value,
-    q2: q2.value,
-    q3: q3.value,
-    q4: q4.value,
-    q5: q5.value,
-    q6: q6.value,
-    q7: q7.value,
-    q8: desc.value,
-    typingSpeed: typingSpeed.toFixed(2),
-    backspaceCount,
-    responseTime: responseTime.toFixed(2),
-    trustScore,
-    status
+    userId: document.getElementById("userId").value,
+    age: document.getElementById("age").value,
+    gender: document.getElementById("gender").value,
+    city: document.getElementById("city").value,
+    address: document.getElementById("address").value,
+    phone: document.getElementById("phone").value,
+    email: document.getElementById("email").value,
+    q1: document.getElementById("q1").value,
+    q2: document.getElementById("q2").value,
+    q3: document.getElementById("q3").value,
+    q4: document.getElementById("q4").value,
+    q5: document.getElementById("q5").value,
+    q6: document.getElementById("q6").value,
+    q7: document.getElementById("q7").value,
+    description: descField.value,  // ✅ Changed from q8 to description
+    typingSpeed: typingSpeed,
+    backspaceCount: backspaceCount,
+    totalTime: totalTime,          // ✅ Changed from responseTime to totalTime
+    trustScore: trustScore,
+    status: status
   };
 
-  const res = await fetch("/submit", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
-  });
+  console.log("📤 Sending data:", data);
 
-  alert(await res.text());
-  e.target.reset();
+  try {
+    const res = await fetch("/submit", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    });
+
+    const text = await res.text();
+    alert(text);
+    
+    if (res.ok) {
+      e.target.reset();
+      // Reset metrics
+      charCount = 0;
+      backspaceCount = 0;
+    }
+  } catch (err) {
+    console.error("❌ Error:", err);
+    alert("Failed to submit. Please try again.");
+  }
 });
 </script>
 </body>
