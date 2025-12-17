@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Fake Data Detection Survey</title>
+<title>Smart Survey Form</title>
 
 <style>
 body {
@@ -13,7 +13,6 @@ body {
   justify-content: center;
   align-items: center;
 }
-
 .container {
   background: white;
   padding: 30px;
@@ -21,22 +20,14 @@ body {
   border-radius: 16px;
   box-shadow: 0 15px 40px rgba(0,0,0,0.25);
 }
-
 h2 { text-align: center; }
-
 .section {
   margin-top: 20px;
   font-weight: bold;
   border-bottom: 1px solid #ddd;
   padding-bottom: 5px;
 }
-
-label {
-  margin-top: 12px;
-  display: block;
-  font-weight: 600;
-}
-
+label { margin-top: 12px; display: block; font-weight: 600; }
 input, select, textarea {
   width: 100%;
   padding: 10px;
@@ -44,7 +35,6 @@ input, select, textarea {
   border-radius: 8px;
   border: 1px solid #ccc;
 }
-
 button {
   width: 100%;
   margin-top: 25px;
@@ -75,7 +65,7 @@ button {
 
 <label>Gender</label>
 <select id="gender" required>
-  <option value="" disabled selected>Select one option</option>
+  <option value="" disabled selected>Select</option>
   <option>Male</option>
   <option>Female</option>
   <option>Other</option>
@@ -143,15 +133,18 @@ document.querySelectorAll("input, textarea").forEach(el => {
 document.getElementById("dataForm").addEventListener("submit", async e => {
   e.preventDefault();
 
-  const totalTime = ((Date.now() - startTime) / 1000);
-  const typingSpeed = charCount / totalTime;
+  const responseTime = ((Date.now() - startTime) / 1000);
+  const typingSpeed = charCount / responseTime;
 
   let trustScore = 100;
   if (typingSpeed > 12) trustScore -= 30;
   if (backspaceCount < 2) trustScore -= 20;
-  if (totalTime < 10) trustScore -= 20;
+  if (responseTime < 10) trustScore -= 20;
 
-  let status = trustScore < 40 ? "Fake" : trustScore < 60 ? "Suspicious" : "Genuine";
+  let status =
+    trustScore < 40 ? "Fake" :
+    trustScore < 60 ? "Suspicious" :
+    "Genuine";
 
   const data = {
     userId: userId.value,
@@ -168,10 +161,10 @@ document.getElementById("dataForm").addEventListener("submit", async e => {
     q5: q5.value,
     q6: q6.value,
     q7: q7.value,
-    description: description.value,
+    q8: description.value,          // ✅ FIXED
     typingSpeed: typingSpeed.toFixed(2),
     backspaceCount,
-    totalTime: totalTime.toFixed(2),
+    responseTime: responseTime.toFixed(2),
     trustScore,
     status
   };
@@ -182,9 +175,7 @@ document.getElementById("dataForm").addEventListener("submit", async e => {
     body: JSON.stringify(data)
   });
 
-  const msg = await res.text();
-  alert(msg);
-
+  alert(await res.text());
   dataForm.reset();
   startTime = null;
   backspaceCount = 0;
