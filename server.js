@@ -7,7 +7,7 @@ app.use(express.static(__dirname));
 
 // 🔴 Your Google Apps Script Web App URL
 const GOOGLE_SHEET_URL =
-  "https://script.google.com/macros/s/AKfycbyvAC6r7TsSBnelOu7rW0YU8j78jZrOai47QrmcIcrc-SfOcCjFMfHxyFBpP9iWVDuRBw/exec";
+  "https://script.google.com/macros/s/AKfycbyVaSfB2tXawhpALHOZuzc-q7PJEJ_QLVQtO5Ew-qeKTC8VnUotVqftzL407-IpHDgJdQ/exec";
 
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "index.html"));
@@ -44,3 +44,4 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () =>
   console.log(`✅ Server running on http://localhost:${PORT}`)
 );
+
