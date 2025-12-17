@@ -6,7 +6,7 @@ app.use(express.json());
 
 // 🔴 PUT YOUR NEW APPS SCRIPT URL HERE
 const GOOGLE_SHEET_URL =
-  "https://script.google.com/macros/s/AKfycbxALCnSyu4u_M8SctDxmSyY2PPZKZ4plJG8v8Dstnc-c5uTu0fQi4y9YRNeQ8LFMNZmEw/exec";
+  "https://script.google.com/macros/s/AKfycbx_XnXuD8Lmj1D_wBSunMkRqhPJtwFgksfFe4_qqZJLhHo2fdrIs7PhgUFrDQup_L3W9Q/exec";
 
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "index.html"));
@@ -40,3 +40,4 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
