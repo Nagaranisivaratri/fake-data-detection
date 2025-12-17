@@ -119,21 +119,18 @@ let startTime = null;
 let backspaceCount = 0;
 let charCount = 0;
 
-document.querySelectorAll("input, textarea").forEach(el => {
-  el.addEventListener("focus", () => {
-    if (!startTime) startTime = Date.now();
-  });
+const desc = document.getElementById("description");
 
-  el.addEventListener("keydown", e => {
-    if (e.key === "Backspace") backspaceCount++;
-    else if (e.key.length === 1) charCount++;
-  });
+desc.addEventListener("keydown", e => {
+  if (!startTime) startTime = Date.now();
+  if (e.key === "Backspace") backspaceCount++;
+  else if (e.key.length === 1) charCount++;
 });
 
 document.getElementById("dataForm").addEventListener("submit", async e => {
   e.preventDefault();
 
-  const responseTime = ((Date.now() - startTime) / 1000);
+  const responseTime = (Date.now() - startTime) / 1000;
   const typingSpeed = charCount / responseTime;
 
   let trustScore = 100;
@@ -141,19 +138,19 @@ document.getElementById("dataForm").addEventListener("submit", async e => {
   if (backspaceCount < 2) trustScore -= 20;
   if (responseTime < 10) trustScore -= 20;
 
-  let status =
+  const status =
     trustScore < 40 ? "Fake" :
     trustScore < 60 ? "Suspicious" :
     "Genuine";
 
   const data = {
-    userId: userId.value,
-    age: age.value,
-    gender: gender.value,
-    city: city.value,
-    address: address.value,
-    phone: phone.value,
-    email: email.value,
+    userId: document.getElementById("userId").value,
+    age: document.getElementById("age").value,
+    gender: document.getElementById("gender").value,
+    city: document.getElementById("city").value,
+    address: document.getElementById("address").value,
+    phone: document.getElementById("phone").value,
+    email: document.getElementById("email").value,
     q1: q1.value,
     q2: q2.value,
     q3: q3.value,
@@ -161,7 +158,7 @@ document.getElementById("dataForm").addEventListener("submit", async e => {
     q5: q5.value,
     q6: q6.value,
     q7: q7.value,
-    q8: description.value,          // ✅ FIXED
+    q8: desc.value,
     typingSpeed: typingSpeed.toFixed(2),
     backspaceCount,
     responseTime: responseTime.toFixed(2),
@@ -176,7 +173,8 @@ document.getElementById("dataForm").addEventListener("submit", async e => {
   });
 
   alert(await res.text());
-  dataForm.reset();
+
+  e.target.reset();
   startTime = null;
   backspaceCount = 0;
   charCount = 0;
