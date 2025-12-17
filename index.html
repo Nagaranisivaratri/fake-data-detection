@@ -27,7 +27,11 @@ h2 { text-align: center; }
   border-bottom: 1px solid #ddd;
   padding-bottom: 5px;
 }
-label { margin-top: 12px; display: block; font-weight: 600; }
+label {
+  margin-top: 12px;
+  display: block;
+  font-weight: 600;
+}
 input, select, textarea {
   width: 100%;
   padding: 10px;
@@ -65,7 +69,7 @@ button {
 
 <label>Gender</label>
 <select id="gender" required>
-  <option value="" disabled selected>Select</option>
+  <option value="" disabled selected>Please select one option</option>
   <option>Male</option>
   <option>Female</option>
   <option>Other</option>
@@ -86,25 +90,46 @@ button {
 <div class="section">Personality & Habits</div>
 
 <label>I plan my work before starting</label>
-<select id="q1" required><option disabled selected></option><option>Yes</option><option>Sometimes</option><option>No</option></select>
+<select id="q1" required>
+  <option value="" disabled selected>Please select one option</option>
+  <option>Yes</option><option>Sometimes</option><option>No</option>
+</select>
 
 <label>I enjoy learning new things</label>
-<select id="q2" required><option disabled selected></option><option>Always</option><option>Sometimes</option><option>Never</option></select>
+<select id="q2" required>
+  <option value="" disabled selected>Please select one option</option>
+  <option>Always</option><option>Sometimes</option><option>Never</option>
+</select>
 
 <label>I complete tasks on time</label>
-<select id="q3" required><option disabled selected></option><option>Yes</option><option>Sometimes</option><option>No</option></select>
+<select id="q3" required>
+  <option value="" disabled selected>Please select one option</option>
+  <option>Yes</option><option>Sometimes</option><option>No</option>
+</select>
 
 <label>I get distracted easily</label>
-<select id="q4" required><option disabled selected></option><option>Yes</option><option>Sometimes</option><option>No</option></select>
+<select id="q4" required>
+  <option value="" disabled selected>Please select one option</option>
+  <option>Yes</option><option>Sometimes</option><option>No</option>
+</select>
 
 <label>I check my work before submitting</label>
-<select id="q5" required><option disabled selected></option><option>Always</option><option>Sometimes</option><option>Never</option></select>
+<select id="q5" required>
+  <option value="" disabled selected>Please select one option</option>
+  <option>Always</option><option>Sometimes</option><option>Never</option>
+</select>
 
 <label>I feel comfortable talking to new people</label>
-<select id="q6" required><option disabled selected></option><option>Yes</option><option>Sometimes</option><option>No</option></select>
+<select id="q6" required>
+  <option value="" disabled selected>Please select one option</option>
+  <option>Yes</option><option>Sometimes</option><option>No</option>
+</select>
 
 <label>I like helping others</label>
-<select id="q7" required><option disabled selected></option><option>Yes</option><option>Sometimes</option><option>No</option></select>
+<select id="q7" required>
+  <option value="" disabled selected>Please select one option</option>
+  <option>Yes</option><option>Sometimes</option><option>No</option>
+</select>
 
 <div class="section">Short Answer</div>
 <label>Describe yourself in one line</label>
@@ -115,23 +140,25 @@ button {
 </div>
 
 <script>
-let startTime = null;
+// 🔹 FORM RESPONSE TIMER (PAGE LOAD)
+const formStartTime = Date.now();
+
+// 🔹 TYPING METRICS
 let backspaceCount = 0;
 let charCount = 0;
 
 const desc = document.getElementById("description");
-
 desc.addEventListener("keydown", e => {
-  if (!startTime) startTime = Date.now();
   if (e.key === "Backspace") backspaceCount++;
   else if (e.key.length === 1) charCount++;
 });
 
+// 🔹 SUBMIT HANDLER
 document.getElementById("dataForm").addEventListener("submit", async e => {
   e.preventDefault();
 
-  const responseTime = (Date.now() - startTime) / 1000;
-  const typingSpeed = charCount / responseTime;
+  const responseTime = (Date.now() - formStartTime) / 1000;
+  const typingSpeed = charCount / Math.max(responseTime, 1);
 
   let trustScore = 100;
   if (typingSpeed > 12) trustScore -= 30;
@@ -144,13 +171,13 @@ document.getElementById("dataForm").addEventListener("submit", async e => {
     "Genuine";
 
   const data = {
-    userId: document.getElementById("userId").value,
-    age: document.getElementById("age").value,
-    gender: document.getElementById("gender").value,
-    city: document.getElementById("city").value,
-    address: document.getElementById("address").value,
-    phone: document.getElementById("phone").value,
-    email: document.getElementById("email").value,
+    userId: userId.value,
+    age: age.value,
+    gender: gender.value,
+    city: city.value,
+    address: address.value,
+    phone: phone.value,
+    email: email.value,
     q1: q1.value,
     q2: q2.value,
     q3: q3.value,
@@ -173,11 +200,7 @@ document.getElementById("dataForm").addEventListener("submit", async e => {
   });
 
   alert(await res.text());
-
   e.target.reset();
-  startTime = null;
-  backspaceCount = 0;
-  charCount = 0;
 });
 </script>
 </body>
